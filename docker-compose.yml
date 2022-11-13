@@ -1,0 +1,29 @@
+version: '3'
+services:
+  encoder:
+    build:
+      context: docker/encoder
+    container_name: encoder
+    privileged: true
+    tty: true
+    environment:
+      - AWS_REGION=ap-northeast-1
+      - AWS_ACCESS_KEY_ID=minio_access_key
+      - AWS_SECRET_ACCESS_KEY=minio_secret_key
+    volumes:
+      - ./:/app
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio_password
+      - MINIO_ACCESS_KEY=minio_access_key
+      - MINIO_SECRET_KEY=minio_secret_key
+    command: server /export --address :9000 --console-address :9001
+    volumes:
+      - ./docker/minio/data:/export
